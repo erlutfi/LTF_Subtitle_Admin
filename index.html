@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LTF License Admin</title>
+<style>
+  :root {
+    --bg: #0c0c10;
+    --panel: #16161e;
+    --panel-2: #1d1d28;
+    --border: rgba(255,255,255,0.07);
+    --border-strong: rgba(255,255,255,0.14);
+    --text: #e7e7ee;
+    --text-dim: #9a9aa8;
+    --text-muted: #6a6a78;
+    --brand: #6250c9;
+    --brand-2: #8b80d4;
+    --success: #4ade80;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --info: #60a5fa;
+    --radius: 8px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  input, select, textarea { font-family: inherit; }
+  a { color: var(--brand-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ===== LOGIN SCREEN ===== */
+  .screen { display: none; }
+  .screen.active { display: block; }
+  #login-screen {
+    min-height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  #login-screen.active { display: flex; }
+  .login-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: var(--shadow);
+  }
+  .login-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .login-title .dot {
+    width: 10px; height: 10px;
+    background: var(--brand-2);
+    border-radius: 50%;
+  }
+  .login-sub {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin: 0 0 22px;
+  }
+  .input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: border-color 0.15s;
+  }
+  .input:focus { outline: none; border-color: var(--brand-2); }
+  .input.mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--brand), #5544b5);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    transition: filter 0.15s, opacity 0.15s;
+  }
+  .btn-primary:hover { filter: brightness(1.12); }
+  .btn-primary:disabled { opacity: 0.5; cursor: wait; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border-strong);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.04); color: var(--text); border-color: var(--text-muted); }
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid rgba(248,113,113,0.4);
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+  }
+  .btn-danger:hover { background: rgba(248,113,113,0.1); }
+  .btn-success {
+    background: transparent;
+    color: var(--success);
+    border: 1px solid rgba(74,222,128,0.4);
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+  }
+  .btn-success:hover { background: rgba(74,222,128,0.1); }
+  .btn-icon {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 5px 9px;
+    border-radius: 5px;
+    font-size: 12px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-icon:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .checkbox-row {
+    display: flex; align-items: center; gap: 8px;
+    margin: 12px 0 4px;
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+  .checkbox-row input { accent-color: var(--brand-2); }
+  .login-actions { display: flex; gap: 10px; margin-top: 18px; align-items: center; }
+  .login-help {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  /* ===== DASHBOARD ===== */
+  #dashboard-screen { min-height: 100vh; padding: 0; }
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    position: sticky; top: 0; z-index: 5;
+  }
+  .top-bar .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 600;
+  }
+  .top-bar .brand .dot { width: 8px; height: 8px; background: var(--brand-2); border-radius: 50%; }
+  .top-bar .actions { display: flex; gap: 8px; align-items: center; }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .toolbar .search {
+    flex: 1;
+    min-width: 220px;
+    max-width: 360px;
+  }
+  .toolbar .grow { flex: 1; }
+
+  /* ===== LICENSES TABLE ===== */
+  .table-wrap { padding: 20px 24px 60px; }
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .table thead th {
+    background: var(--panel-2);
+    color: var(--text-dim);
+    text-align: left;
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .table tbody tr:hover { background: rgba(255,255,255,0.02); }
+  .table tbody tr.expanded { background: rgba(98,80,201,0.05); }
+  .table td {
+    padding: 12px 14px;
+    vertical-align: middle;
+    font-size: 13px;
+  }
+  .table .license-key {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--brand-2);
+    font-weight: 600;
+  }
+  .table .toggle-arrow {
+    display: inline-block;
+    width: 16px;
+    color: var(--text-muted);
+    transition: transform 0.15s;
+    cursor: pointer;
+    user-select: none;
+  }
+  tr.expanded .toggle-arrow { transform: rotate(90deg); color: var(--brand-2); }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 11px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .status-pill.active   { background: rgba(74,222,128,0.13); color: var(--success); }
+  .status-pill.inactive { background: rgba(248,113,113,0.13); color: var(--danger); }
+  .status-pill.expired  { background: rgba(251,191,36,0.13); color: var(--warn); }
+  .status-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.85; }
+
+  .devices-cell { color: var(--text-dim); font-size: 12px; }
+  .devices-cell strong { color: var(--text); font-weight: 600; }
+  .actions-cell { text-align: right; white-space: nowrap; }
+  .actions-cell .btn-icon { margin-left: 4px; }
+
+  /* Devices expandable panel */
+  .devices-row td {
+    background: var(--panel-2);
+    padding: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .devices-panel {
+    padding: 16px 24px 18px 48px;
+    border-top: 1px dashed var(--border);
+  }
+  .devices-panel h4 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 500;
+  }
+  .device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .device-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .device-item.revoked { opacity: 0.55; }
+  .device-icon {
+    font-size: 16px;
+    width: 22px;
+    text-align: center;
+  }
+  .device-meta { flex: 1; min-width: 0; }
+  .device-name { font-weight: 500; font-size: 13px; }
+  .device-sub { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+  .device-sub .sep { margin: 0 6px; opacity: 0.4; }
+  .device-actions { display: flex; gap: 6px; }
+
+  .devices-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 4px 14px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .info-grid .label { opacity: 0.7; }
+  .info-grid .value { color: var(--text); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state h3 { margin: 0 0 4px; color: var(--text-dim); font-weight: 500; }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: var(--panel);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 24px 26px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: var(--shadow);
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+  .modal-body { font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-bottom: 18px; }
+  .form-row { margin-bottom: 14px; }
+  .form-label {
+    display: block;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  /* Issued license display */
+  .key-display {
+    background: rgba(98,80,201,0.1);
+    border: 1px solid rgba(98,80,201,0.3);
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 14px;
+    color: var(--brand-2);
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 1px;
+    user-select: all;
+    margin: 8px 0 14px;
+  }
+  .copy-btn {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border-strong);
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--text-muted); }
+  .copy-btn.copied { color: var(--success); border-color: rgba(74,222,128,0.4); }
+
+  /* ===== TOAST ===== */
+  #toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--panel);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    font-size: 13px;
+    min-width: 240px;
+    max-width: 380px;
+    pointer-events: auto;
+    border-left: 3px solid var(--brand-2);
+    animation: toastIn 0.2s ease-out;
+  }
+  .toast.success { border-left-color: var(--success); }
+  .toast.error   { border-left-color: var(--danger);  }
+  .toast.warn    { border-left-color: var(--warn);    }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ===== LOADING ===== */
+  .loading {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-muted);
+  }
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid var(--border-strong);
+    border-top-color: var(--brand-2);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 720px) {
+    .top-bar, .toolbar, .table-wrap { padding-left: 14px; padding-right: 14px; }
+    .table thead { display: none; }
+    .table tbody tr { display: block; padding: 12px 0; }
+    .table td { display: block; padding: 4px 14px; }
+    .table .actions-cell { text-align: left; padding-top: 10px; }
+    .devices-panel { padding-left: 14px; padding-right: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN SCREEN
+============================================================ -->
+<div id="login-screen" class="screen active">
+  <div class="login-card">
+    <h1 class="login-title"><span class="dot"></span> LTF License Admin</h1>
+    <p class="login-sub">Sign in with your admin token to manage licenses.</p>
+
+    <div class="form-row">
+      <label class="form-label" for="token-input">Admin Token</label>
+      <input id="token-input" class="input mono" type="password" autocomplete="off" spellcheck="false" placeholder="64-character hex">
+    </div>
+
+    <label class="checkbox-row">
+      <input id="remember-token" type="checkbox" checked> Remember on this device
+    </label>
+
+    <div class="login-actions">
+      <button id="login-btn" class="btn-primary" style="flex:1;">Sign In</button>
+    </div>
+
+    <p class="login-help">
+      The token is your Supabase Edge Function <code>ADMIN_TOKEN</code> secret. If you lose it, generate a new one in
+      Supabase Studio → Edge Functions → Secrets, then sign in again.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     DASHBOARD
+============================================================ -->
+<div id="dashboard-screen" class="screen">
+  <div class="top-bar">
+    <div class="brand"><span class="dot"></span> LTF License Admin</div>
+    <div class="actions">
+      <button id="refresh-btn" class="btn-ghost" title="Reload">↻ Refresh</button>
+      <button id="logout-btn" class="btn-ghost">Sign out</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input id="search-input" class="input search" type="text" placeholder="Search by email, name, key, or notes...">
+    <select id="filter-status" class="input" style="max-width: 160px;">
+      <option value="all">All statuses</option>
+      <option value="active">Active only</option>
+      <option value="inactive">Inactive only</option>
+      <option value="expired">Expired only</option>
+    </select>
+    <div class="grow"></div>
+    <button id="issue-btn" class="btn-primary">+ Issue new license</button>
+  </div>
+
+  <div id="table-wrap" class="table-wrap">
+    <div class="loading"><span class="spinner"></span>Loading licenses…</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ISSUE NEW LICENSE MODAL
+============================================================ -->
+<div id="issue-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 class="modal-title">Issue new license</h3>
+
+    <div id="issue-form">
+      <div class="form-row">
+        <label class="form-label">Email <span style="color:var(--danger);">*</span></label>
+        <input id="iss-email" class="input" type="email" placeholder="user@example.com">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Name (display label) <span style="color:var(--danger);">*</span></label>
+        <input id="iss-name" class="input" type="text" placeholder="e.g. Ahmet — Core Team">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Notes (your private)</label>
+        <input id="iss-notes" class="input" type="text" placeholder="Optional notes only you see">
+      </div>
+      <div class="form-row" style="display:flex; gap:12px;">
+        <div style="flex:1;">
+          <label class="form-label">Max devices</label>
+          <input id="iss-max" class="input" type="number" min="1" max="20" value="1">
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">Expires</label>
+          <select id="iss-expires" class="input">
+            <option value="1y">In 1 year</option>
+            <option value="6m">In 6 months</option>
+            <option value="3m">In 3 months</option>
+            <option value="1m">In 1 month</option>
+            <option value="never">Never</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close="issue-modal">Cancel</button>
+        <button id="iss-submit" class="btn-primary">Issue license</button>
+      </div>
+    </div>
+
+    <div id="issue-result" style="display:none;">
+      <p class="modal-body">License created successfully. Share this key with the user:</p>
+      <div id="issued-key" class="key-display"></div>
+      <div style="text-align:center;">
+        <button id="copy-key" class="copy-btn">📋 Copy key</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" data-close="issue-modal" id="issue-done">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CONFIRM MODAL
+============================================================ -->
+<div id="confirm-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 class="modal-title" id="confirm-title">Confirm</h3>
+    <p class="modal-body" id="confirm-body"></p>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="confirm-cancel">Cancel</button>
+      <button class="btn-primary" id="confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TOAST CONTAINER
+============================================================ -->
+<div id="toast-container"></div>
+
+<script>
+// =============================================================
+// CONFIG
+// =============================================================
+const FUNCTION_URL = "https://aroluihjwoyjiypcpzhm.supabase.co/functions/v1/admin-licenses";
+const TOKEN_KEY    = "ltf_admin_token";
+
+// =============================================================
+// STATE
+// =============================================================
+let adminToken = null;
+let licenses   = [];
+let devicesCache = {}; // license_id -> [devices]
+let expandedLicenseId = null;
+
+// =============================================================
+// API HELPERS
+// =============================================================
+async function callAdmin(action, payload = {}) {
+  if (!adminToken) throw new Error("Not signed in");
+  const res = await fetch(FUNCTION_URL, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "Authorization": "Bearer " + adminToken,
+    },
+    body: JSON.stringify({ action, ...payload }),
+  });
+  let data = null;
+  try { data = await res.json(); } catch (_) {}
+  if (res.status === 401) {
+    logout();
+    throw new Error("Your session expired or token is invalid.");
+  }
+  if (!data || !data.ok) {
+    throw new Error((data && data.error) || `HTTP ${res.status}`);
+  }
+  return data;
+}
+
+// =============================================================
+// LOGIN / LOGOUT
+// =============================================================
+function showLogin() {
+  document.getElementById("login-screen").classList.add("active");
+  document.getElementById("dashboard-screen").classList.remove("active");
+}
+function showDashboard() {
+  document.getElementById("login-screen").classList.remove("active");
+  document.getElementById("dashboard-screen").classList.add("active");
+}
+
+async function attemptLogin() {
+  const input = document.getElementById("token-input").value.trim();
+  const remember = document.getElementById("remember-token").checked;
+  if (!input) return toast("Please enter your admin token", "error");
+  const btn = document.getElementById("login-btn");
+  btn.disabled = true; btn.textContent = "Signing in…";
+  adminToken = input;
+  try {
+    await refreshLicenses();
+    if (remember) localStorage.setItem(TOKEN_KEY, input);
+    showDashboard();
+    toast("Welcome back", "success");
+  } catch (e) {
+    adminToken = null;
+    toast("Sign-in failed: " + e.message, "error");
+  } finally {
+    btn.disabled = false; btn.textContent = "Sign In";
+  }
+}
+
+function logout() {
+  adminToken = null;
+  localStorage.removeItem(TOKEN_KEY);
+  document.getElementById("token-input").value = "";
+  licenses = [];
+  devicesCache = {};
+  expandedLicenseId = null;
+  showLogin();
+}
+
+// =============================================================
+// LICENSE FETCH + RENDER
+// =============================================================
+async function refreshLicenses() {
+  const tw = document.getElementById("table-wrap");
+  if (licenses.length === 0) {
+    tw.innerHTML = '<div class="loading"><span class="spinner"></span>Loading licenses…</div>';
+  }
+  const data = await callAdmin("list");
+  licenses = data.licenses || [];
+  applyFilterAndRender();
+}
+
+function applyFilterAndRender() {
+  const q = document.getElementById("search-input").value.trim().toLowerCase();
+  const filter = document.getElementById("filter-status").value;
+  let filtered = licenses.slice();
+
+  if (q) {
+    filtered = filtered.filter(l =>
+      (l.email || "").toLowerCase().includes(q) ||
+      (l.name  || "").toLowerCase().includes(q) ||
+      (l.notes || "").toLowerCase().includes(q) ||
+      (l.license_key || "").toLowerCase().includes(q)
+    );
+  }
+  if (filter !== "all") {
+    filtered = filtered.filter(l => statusOf(l) === filter);
+  }
+  renderTable(filtered);
+}
+
+function statusOf(l) {
+  if (!l.is_active) return "inactive";
+  if (l.expires_at && new Date(l.expires_at) < new Date()) return "expired";
+  return "active";
+}
+
+function fmtDate(s) {
+  if (!s) return "Never";
+  try {
+    return new Date(s).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  } catch (_) { return "—"; }
+}
+
+function fmtRelative(s) {
+  if (!s) return "—";
+  try {
+    const d = new Date(s);
+    const diff = Date.now() - d.getTime();
+    if (diff < 0) return "just now";
+    const sec = Math.round(diff / 1000);
+    if (sec < 60) return "just now";
+    const min = Math.round(sec / 60);
+    if (min < 60) return min + "m ago";
+    const hr  = Math.round(min / 60);
+    if (hr < 24) return hr + "h ago";
+    const day = Math.round(hr / 24);
+    return day + "d ago";
+  } catch (_) { return "—"; }
+}
+
+function formatKey(stored) {
+  if (!stored) return "";
+  const s = String(stored).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (s.length <= 3) return s;
+  const prefix = s.slice(0, 3);
+  const rest = s.slice(3);
+  const groups = rest.match(/.{1,4}/g) || [];
+  return prefix + (groups.length ? "-" + groups.join("-") : "");
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+function renderTable(rows) {
+  const tw = document.getElementById("table-wrap");
+  if (rows.length === 0) {
+    tw.innerHTML = '<div class="empty-state"><h3>No licenses found</h3><p>Try changing your filters or issue a new license.</p></div>';
+    return;
+  }
+  const trs = rows.map(l => {
+    const status = statusOf(l);
+    const isExp = expandedLicenseId === l.id;
+    const displayKey = formatKey(l.license_key);
+    const slotsUsed = l.active_devices || 0;
+    const slotsTotal = l.max_devices || 1;
+    return `
+      <tr data-license-id="${l.id}" class="${isExp ? "expanded" : ""}">
+        <td><span class="toggle-arrow" data-toggle="${l.id}">▶</span></td>
+        <td><span class="license-key">${esc(displayKey)}</span></td>
+        <td>${esc(l.email || "—")}</td>
+        <td>${esc(l.name || "—")}</td>
+        <td><span class="status-pill ${status}">${status}</span></td>
+        <td class="devices-cell"><strong>${slotsUsed}</strong> / ${slotsTotal} devices</td>
+        <td>${fmtDate(l.expires_at)}</td>
+        <td class="actions-cell">
+          ${status === "inactive"
+            ? `<button class="btn-success" data-action="reactivate_license" data-id="${l.id}">Reactivate</button>`
+            : `<button class="btn-danger" data-action="revoke_license" data-id="${l.id}">Revoke</button>`}
+        </td>
+      </tr>
+      ${isExp ? `<tr class="devices-row"><td colspan="8">${renderDevicesPanel(l)}</td></tr>` : ""}
+    `;
+  }).join("");
+
+  tw.innerHTML = `
+    <table class="table">
+      <thead>
+        <tr>
+          <th style="width:30px;"></th>
+          <th>License key</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Devices</th>
+          <th>Expires</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>${trs}</tbody>
+    </table>
+  `;
+}
+
+function renderDevicesPanel(l) {
+  const devices = devicesCache[l.id];
+  let listHtml;
+  if (!devices) {
+    listHtml = '<div class="loading"><span class="spinner"></span>Loading devices…</div>';
+  } else if (devices.length === 0) {
+    listHtml = '<div style="color: var(--text-muted); font-size: 12px;">No devices have activated this license yet.</div>';
+  } else {
+    listHtml = '<div class="device-list">' + devices.map(d => {
+      const icon = d.platform === "win" ? "🪟" : "🖥";
+      const revokedTxt = d.is_revoked ? '<span style="color: var(--danger);">REVOKED</span> <span class="sep">•</span>' : "";
+      return `
+        <div class="device-item ${d.is_revoked ? "revoked" : ""}">
+          <span class="device-icon">${icon}</span>
+          <div class="device-meta">
+            <div class="device-name">${esc(d.device_name || "Unnamed device")}</div>
+            <div class="device-sub">
+              ${revokedTxt}
+              <span>${esc(d.platform || "?")}</span>
+              <span class="sep">•</span>
+              <span>activated ${fmtRelative(d.activated_at)}</span>
+              <span class="sep">•</span>
+              <span>last seen ${fmtRelative(d.last_seen_at)}</span>
+            </div>
+          </div>
+          <div class="device-actions">
+            ${d.is_revoked
+              ? `<button class="btn-success" data-action="unrevoke_device" data-id="${d.id}" data-license="${l.id}">Restore</button>`
+              : `<button class="btn-danger" data-action="revoke_device" data-id="${d.id}" data-license="${l.id}">Revoke</button>`}
+            <button class="btn-icon" data-action="delete_device" data-id="${d.id}" data-license="${l.id}" title="Delete activation (free up the slot)">🗑</button>
+          </div>
+        </div>
+      `;
+    }).join("") + "</div>";
+  }
+
+  return `
+    <div class="devices-panel">
+      <div class="info-grid" style="margin-bottom: 16px;">
+        <span class="label">License ID:</span><span class="value" style="font-family: monospace; font-size: 11px;">${esc(l.id)}</span>
+        <span class="label">Created:</span><span class="value">${fmtDate(l.created_at)}</span>
+        <span class="label">Notes:</span><span class="value">${esc(l.notes || "—")}</span>
+      </div>
+      <h4>Devices on this license</h4>
+      ${listHtml}
+      <div class="devices-footer">
+        <span style="color: var(--text-muted); font-size: 11px;">Tip: "Revoke" disables but keeps the slot. "Delete" frees the slot so a new device can activate.</span>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-icon" data-action="edit_license" data-id="${l.id}">✏️ Edit</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// =============================================================
+// EVENT WIRING
+// =============================================================
+document.addEventListener("click", async (e) => {
+  // Login
+  if (e.target.id === "login-btn") return attemptLogin();
+  if (e.target.id === "logout-btn") return logout();
+  if (e.target.id === "refresh-btn") return doRefresh();
+  if (e.target.id === "issue-btn") return openIssueModal();
+
+  // Modal close
+  const closeId = e.target.dataset.close;
+  if (closeId) { closeModal(closeId); return; }
+
+  // Issue submit
+  if (e.target.id === "iss-submit") return submitIssue();
+  if (e.target.id === "copy-key") return copyIssuedKey();
+
+  // Confirm modal buttons
+  if (e.target.id === "confirm-cancel") return resolveConfirm(false);
+  if (e.target.id === "confirm-ok") return resolveConfirm(true);
+
+  // Toggle row
+  const toggleId = e.target.dataset.toggle;
+  if (toggleId) return toggleRow(toggleId);
+
+  // Row actions
+  const action = e.target.dataset.action;
+  const id     = e.target.dataset.id;
+  const licId  = e.target.dataset.license;
+  if (action) return handleRowAction(action, id, licId);
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && document.activeElement.id === "token-input") attemptLogin();
+});
+
+document.getElementById("search-input").addEventListener("input", applyFilterAndRender);
+document.getElementById("filter-status").addEventListener("change", applyFilterAndRender);
+
+async function doRefresh() {
+  try {
+    await refreshLicenses();
+    toast("Refreshed", "success");
+  } catch (e) {
+    toast("Refresh failed: " + e.message, "error");
+  }
+}
+
+async function toggleRow(licenseId) {
+  if (expandedLicenseId === licenseId) {
+    expandedLicenseId = null;
+    applyFilterAndRender();
+    return;
+  }
+  expandedLicenseId = licenseId;
+  // Re-render immediately so the row expands (showing spinner)
+  applyFilterAndRender();
+  if (!devicesCache[licenseId]) {
+    try {
+      const data = await callAdmin("get_devices", { license_id: licenseId });
+      devicesCache[licenseId] = data.devices || [];
+      applyFilterAndRender();
+    } catch (e) {
+      toast("Failed to load devices: " + e.message, "error");
+    }
+  }
+}
+
+async function handleRowAction(action, id, licenseId) {
+  try {
+    if (action === "revoke_license") {
+      if (!await confirm("Revoke this license?", "All devices using this license will lose access on their next online check. You can reactivate it later.", "Revoke")) return;
+      await callAdmin("revoke_license", { license_id: id });
+      toast("License revoked", "success");
+      await refreshLicenses();
+    } else if (action === "reactivate_license") {
+      if (!await confirm("Reactivate license?", "Devices on this license will need to re-activate (their local proof was cleared when revoked). Continue?", "Reactivate")) return;
+      await callAdmin("reactivate_license", { license_id: id });
+      toast("License reactivated", "success");
+      await refreshLicenses();
+    } else if (action === "revoke_device") {
+      if (!await confirm("Revoke this device?", "This device will lose access; other devices on the same license keep working.", "Revoke device")) return;
+      await callAdmin("revoke_device", { activation_id: id });
+      toast("Device revoked", "success");
+      delete devicesCache[licenseId];
+      await refreshLicenses();
+      await loadDevices(licenseId);
+    } else if (action === "unrevoke_device") {
+      await callAdmin("unrevoke_device", { activation_id: id });
+      toast("Device restored", "success");
+      delete devicesCache[licenseId];
+      await refreshLicenses();
+      await loadDevices(licenseId);
+    } else if (action === "delete_device") {
+      if (!await confirm("Delete this activation?", "The device's slot will become available for a new activation. The user can re-activate on a different device. Continue?", "Delete activation")) return;
+      await callAdmin("delete_device", { activation_id: id });
+      toast("Activation deleted", "success");
+      delete devicesCache[licenseId];
+      await refreshLicenses();
+      await loadDevices(licenseId);
+    } else if (action === "edit_license") {
+      openEditModal(id);
+    }
+  } catch (e) {
+    toast("Action failed: " + e.message, "error");
+  }
+}
+
+async function loadDevices(licenseId) {
+  try {
+    const data = await callAdmin("get_devices", { license_id: licenseId });
+    devicesCache[licenseId] = data.devices || [];
+    applyFilterAndRender();
+  } catch (e) {
+    // soft-fail
+  }
+}
+
+// =============================================================
+// ISSUE NEW LICENSE
+// =============================================================
+function openIssueModal() {
+  // Reset form
+  document.getElementById("iss-email").value = "";
+  document.getElementById("iss-name").value = "";
+  document.getElementById("iss-notes").value = "";
+  document.getElementById("iss-max").value = 1;
+  document.getElementById("iss-expires").value = "1y";
+  document.getElementById("issue-form").style.display = "block";
+  document.getElementById("issue-result").style.display = "none";
+  document.getElementById("issue-modal").classList.add("active");
+  setTimeout(() => document.getElementById("iss-email").focus(), 100);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove("active");
+  if (id === "issue-modal" && document.getElementById("issue-result").style.display !== "none") {
+    // We just closed after a successful issue — refresh table
+    refreshLicenses().catch(() => {});
+  }
+}
+
+function computeExpiry(choice) {
+  if (choice === "never") return null;
+  const now = new Date();
+  if (choice === "1y") now.setFullYear(now.getFullYear() + 1);
+  else if (choice === "6m") now.setMonth(now.getMonth() + 6);
+  else if (choice === "3m") now.setMonth(now.getMonth() + 3);
+  else if (choice === "1m") now.setMonth(now.getMonth() + 1);
+  return now.toISOString();
+}
+
+async function submitIssue() {
+  const email = document.getElementById("iss-email").value.trim();
+  const name  = document.getElementById("iss-name").value.trim();
+  const notes = document.getElementById("iss-notes").value.trim();
+  const max   = parseInt(document.getElementById("iss-max").value, 10) || 1;
+  const exp   = computeExpiry(document.getElementById("iss-expires").value);
+
+  if (!email || !name) return toast("Email and name are required.", "error");
+  const btn = document.getElementById("iss-submit");
+  btn.disabled = true; btn.textContent = "Issuing…";
+  try {
+    const data = await callAdmin("issue", {
+      email, name, notes: notes || null, expires_at: exp, max_devices: max,
+    });
+    const displayKey = data.license.license_key_display
+      || formatKey(data.license.license_key_stored || data.license.license_key);
+    document.getElementById("issued-key").textContent = displayKey;
+    document.getElementById("issue-form").style.display = "none";
+    document.getElementById("issue-result").style.display = "block";
+    toast("License issued", "success");
+  } catch (e) {
+    toast("Failed: " + e.message, "error");
+  } finally {
+    btn.disabled = false; btn.textContent = "Issue license";
+  }
+}
+
+async function copyIssuedKey() {
+  const key = document.getElementById("issued-key").textContent;
+  try {
+    await navigator.clipboard.writeText(key);
+    const b = document.getElementById("copy-key");
+    b.classList.add("copied");
+    b.textContent = "✓ Copied";
+    setTimeout(() => { b.classList.remove("copied"); b.textContent = "📋 Copy key"; }, 1800);
+  } catch (e) {
+    toast("Could not copy. Select the text manually.", "warn");
+  }
+}
+
+// =============================================================
+// EDIT LICENSE MODAL (inline simple version using prompts for v1)
+// =============================================================
+async function openEditModal(licenseId) {
+  const l = licenses.find(x => x.id === licenseId);
+  if (!l) return;
+
+  // For v1, simple prompts. Future polish: dedicated modal.
+  const field = await choosePrompt("What do you want to update?", [
+    { label: "Max devices (currently " + l.max_devices + ")", value: "max_devices" },
+    { label: "Expiry (currently " + fmtDate(l.expires_at) + ")", value: "expires_at" },
+    { label: "Email (currently " + (l.email || "—") + ")", value: "email" },
+    { label: "Name (currently " + (l.name || "—") + ")", value: "name" },
+    { label: "Notes", value: "notes" },
+  ]);
+  if (!field) return;
+
+  let newValue;
+  if (field === "max_devices") {
+    const v = window.prompt("New max_devices value (1-20):", l.max_devices);
+    if (v === null) return;
+    newValue = parseInt(v, 10);
+    if (isNaN(newValue) || newValue < 1 || newValue > 20) return toast("Invalid value", "error");
+  } else if (field === "expires_at") {
+    const choice = await choosePrompt("New expiry:", [
+      { label: "In 1 year",  value: "1y" },
+      { label: "In 6 months", value: "6m" },
+      { label: "In 3 months", value: "3m" },
+      { label: "In 1 month",  value: "1m" },
+      { label: "Never (perpetual)", value: "never" },
+    ]);
+    if (!choice) return;
+    newValue = computeExpiry(choice);
+  } else {
+    const v = window.prompt(`New ${field}:`, l[field] || "");
+    if (v === null) return;
+    newValue = v;
+  }
+
+  try {
+    await callAdmin("update_license", { license_id: licenseId, [field]: newValue });
+    toast(`Updated ${field}`, "success");
+    await refreshLicenses();
+  } catch (e) {
+    toast("Update failed: " + e.message, "error");
+  }
+}
+
+// Choose-prompt implemented via confirm modal repurposed as picker.
+// Returns selected value or null if cancelled.
+function choosePrompt(title, options) {
+  return new Promise((resolve) => {
+    const body = options.map(o =>
+      `<button class="btn-ghost" style="display:block; width:100%; text-align:left; margin-bottom:6px;" data-choice="${esc(o.value)}">${esc(o.label)}</button>`
+    ).join("");
+    document.getElementById("confirm-title").textContent = title;
+    document.getElementById("confirm-body").innerHTML = body;
+    document.getElementById("confirm-cancel").textContent = "Cancel";
+    document.getElementById("confirm-ok").style.display = "none";
+    const modal = document.getElementById("confirm-modal");
+    modal.classList.add("active");
+
+    function handler(e) {
+      const choice = e.target.dataset.choice;
+      if (choice !== undefined) {
+        cleanup();
+        resolve(choice);
+      } else if (e.target.id === "confirm-cancel") {
+        cleanup();
+        resolve(null);
+      }
+    }
+    function cleanup() {
+      modal.classList.remove("active");
+      document.getElementById("confirm-ok").style.display = "";
+      document.removeEventListener("click", handler);
+    }
+    document.addEventListener("click", handler);
+  });
+}
+
+// =============================================================
+// CONFIRM MODAL
+// =============================================================
+let _confirmResolver = null;
+
+function confirm(title, body, okText) {
+  return new Promise((resolve) => {
+    document.getElementById("confirm-title").textContent = title;
+    document.getElementById("confirm-body").innerHTML = esc(body);
+    document.getElementById("confirm-ok").textContent = okText || "Confirm";
+    document.getElementById("confirm-cancel").textContent = "Cancel";
+    document.getElementById("confirm-ok").style.display = "";
+    document.getElementById("confirm-modal").classList.add("active");
+    _confirmResolver = resolve;
+  });
+}
+
+function resolveConfirm(value) {
+  document.getElementById("confirm-modal").classList.remove("active");
+  if (_confirmResolver) {
+    _confirmResolver(value);
+    _confirmResolver = null;
+  }
+}
+
+// =============================================================
+// TOAST
+// =============================================================
+function toast(msg, type) {
+  type = type || "info";
+  const container = document.getElementById("toast-container");
+  const div = document.createElement("div");
+  div.className = "toast " + type;
+  div.textContent = msg;
+  container.appendChild(div);
+  setTimeout(() => {
+    div.style.opacity = "0";
+    div.style.transform = "translateX(20px)";
+    div.style.transition = "opacity 0.2s, transform 0.2s";
+    setTimeout(() => div.remove(), 220);
+  }, 3500);
+}
+
+// =============================================================
+// INIT
+// =============================================================
+(function init() {
+  const saved = localStorage.getItem(TOKEN_KEY);
+  if (saved) {
+    adminToken = saved;
+    showDashboard();
+    refreshLicenses().catch((e) => {
+      // Token might be stale
+      logout();
+      toast("Saved session expired — please sign in again", "warn");
+    });
+  } else {
+    showLogin();
+    setTimeout(() => document.getElementById("token-input").focus(), 100);
+  }
+})();
+</script>
+</body>
+</html>
