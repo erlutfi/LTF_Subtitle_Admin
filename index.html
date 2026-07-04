@@ -847,6 +847,7 @@ function renderDevicesPanel(l) {
         <span style="color: var(--text-muted); font-size: 11px;">Tip: "Revoke" disables but keeps the slot. "Delete" frees the slot so a new device can activate.</span>
         <div style="display: flex; gap: 8px;">
           <button class="btn-icon" data-action="edit_license" data-id="${l.id}">✏️ Edit</button>
+          <button class="btn-danger" data-action="delete_license" data-id="${l.id}" title="Permanently delete this license and all its device records (cannot be undone)">🗑 Delete license</button>
         </div>
       </div>
     </div>
@@ -954,6 +955,23 @@ async function handleRowAction(action, id, licenseId) {
       delete devicesCache[licenseId];
       await refreshLicenses();
       await loadDevices(licenseId);
+    } else if (action === "delete_license") {
+      // v3.6.3 — kalıcı silme. Geri alınamaz; iki aşamalı, açık kopyalı onay.
+      const lic = (licenses || []).find(x => x.id === id);
+      const keyTxt = lic ? formatKey(lic.license_key) : "this license";
+      const devCount = lic ? (lic.active_devices || 0) + (lic.revoked_devices || 0) : null;
+      const devTxt = devCount === null ? "all of its device records"
+        : devCount === 0 ? "no device records exist"
+        : devCount + " device record" + (devCount === 1 ? "" : "s") + " will also be removed";
+      if (!await confirm(
+        "Permanently delete " + keyTxt + "?",
+        "This CANNOT be undone. The license is removed from the database (" + devTxt + ") and the key stops working on its next online check. To temporarily disable it instead, use Revoke.",
+        "Delete forever")) return;
+      await callAdmin("delete_license", { license_id: id });
+      toast("License deleted", "success");
+      delete devicesCache[id];
+      if (expandedLicenseId === id) expandedLicenseId = null;
+      await refreshLicenses();
     } else if (action === "edit_license") {
       openEditModal(id);
     }
