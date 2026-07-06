@@ -1,5 +1,5 @@
 {
-  "version": "3.7.0",
-  "notes": "Stability release: single Generate Subtitles flow (renders your comp audio, work-area aligned), Apply now updates in place while keeping your layer customizations, and edits carry across subtitle styles reliably.",
+  "version": "3.7.1",
+  "notes": "Thai and other no-space languages now render correctly (no extra gaps, sentence-length cards, brand names kept intact) + new SRT import/export hub button. Also friendlier guidance when no composition is selected.",
   "url": "https://github.com/erlutfi/LTF_Subtitle_Releases/releases/latest"
 }
