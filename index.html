@@ -809,6 +809,9 @@ function renderDevicesPanel(l) {
     listHtml = '<div class="device-list">' + devices.map(d => {
       const icon = d.platform === "win" ? "🪟" : "🖥";
       const revokedTxt = d.is_revoked ? '<span style="color: var(--danger);">REVOKED</span> <span class="sep">•</span>' : "";
+      const versionTxt = d.app_version
+        ? `<span class="sep">•</span> <span title="Plugin version at last online check">v${esc(d.app_version)}</span>`
+        : `<span class="sep">•</span> <span style="color: var(--text-muted);" title="Client predates v4.0.5 or hasn't checked in since the update">version unknown</span>`;
       return `
         <div class="device-item ${d.is_revoked ? "revoked" : ""}">
           <span class="device-icon">${icon}</span>
@@ -817,6 +820,7 @@ function renderDevicesPanel(l) {
             <div class="device-sub">
               ${revokedTxt}
               <span>${esc(d.platform || "?")}</span>
+              ${versionTxt}
               <span class="sep">•</span>
               <span>activated ${fmtRelative(d.activated_at)}</span>
               <span class="sep">•</span>
