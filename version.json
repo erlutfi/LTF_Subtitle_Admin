@@ -1,5 +1,5 @@
 {
-  "version": "4.0.5",
-  "notes": "Major update: all-new Edit workspace, 12 new subtitle styles, My Styles presets, and a streamlined first-run setup.",
+  "version": "4.0.6",
+  "notes": "Stability update: native Apple Silicon audio engine — fixes the 'Audio processing error' on new Macs — plus clearer installer diagnostics.",
   "url": "https://github.com/erlutfi/LTF_Subtitle_Releases/releases/latest"
 }
